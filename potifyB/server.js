@@ -4,8 +4,6 @@ const app = express();
 const cors = require("cors");
 const crypto = require("crypto");
 
-var app_secret_key = "29185324e8374b11b7b5d311b83b6fa4";
-var CLIENT_ID = "63b30b7a91534d6fa0184a9e67fa1518";
 var REDIRECT_URI = "http://localhost:8000/callback";
 
 var AUTH_URL = "https://accounts.spotify.com/authorize";
@@ -39,7 +37,7 @@ app.get("/login", (req, res) => {
   const authUrl = new URL(AUTH_URL);
   var state = generateRandomString(16);
   const params = {
-    client_id: CLIENT_ID,
+    client_id: process.env.CLIENT_ID,
     response_type: "code",
     scope: scopes,
     redirect_uri: REDIRECT_URI,
@@ -57,9 +55,11 @@ app.get("/login", (req, res) => {
   //   `https://accounts.spotify.com/authorize?client_id=${CLIENT_ID}&response_type=code&redirect_uri=http://localhost:8000/callback`
   // );
   //get respnse and send response back to client
-  axios.get(authUrl).then((response) => {
-    res.send(response.data);
-  });
+
+  //   axios.get(authUrl).then((response) => {
+  //     res.send(response.data);
+  //   });
+  res.redirect(authUrl);
 });
 
 app.get("/callback", async (req, res) => {
@@ -72,8 +72,8 @@ app.get("/callback", async (req, res) => {
     grant_type: "authorization_code",
     code: code,
     redirect_uri: REDIRECT_URI,
-    client_id: CLIENT_ID,
-    client_secret: app_secret_key,
+    client_id: process.env.CLIENT_ID,
+    client_secret: process.env.app_secret_key,
   };
 
   //post request to get access token
